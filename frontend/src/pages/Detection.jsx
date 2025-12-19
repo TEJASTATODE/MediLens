@@ -247,12 +247,12 @@ const Detection = () => {
                                             <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dosage</span>
                                             <div className="text-xs font-black text-slate-900">{result.dosage}</div>
                                         </div>
-                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Form</span>
-                                            <div className="text-xs font-black text-slate-900">{result.form}</div>
-                                        </div>
+                                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Side Effects</span>
+                                        <div className="text-xs font-black text-slate-900">{result.side_effects}</div>
                                     </div>
-
+                                    </div>
+ 
                                     <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
                                         <h4 className="text-[10px] font-black uppercase text-slate-900 mb-2">Molecular Build</h4>
                                         <p className="text-xs text-slate-600 leading-relaxed">{result.composition}</p>
