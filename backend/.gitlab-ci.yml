@@ -1,0 +1,29 @@
+stages:
+  - build
+  - deploy
+
+# 1. BUILD STAGE: Builds the Docker image and pushes it to GitLab's Registry
+build_backend:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  variables:
+    DOCKER_TLS_CERTDIR: "/certs"
+  script:
+    # Log into GitLab's built-in Container Registry
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    # Build the image using your Dockerfile inside the 'backend' folder
+    - docker build -t $CI_REGISTRY_IMAGE/backend:latest ./backend
+    # Push the image so it's stored on GitLab
+    - docker push $CI_REGISTRY_IMAGE/backend:latest
+
+# 2. DEPLOY STAGE: Tells Render there is a new image ready to pull
+deploy_to_render:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    # This triggers Render's "Deploy Hook" using the variable you saved
+    - curl -X POST $RENDER_DEPLOY_HOOK
+  only:
+    - main # This ensures it only deploys when you push to the main branch
