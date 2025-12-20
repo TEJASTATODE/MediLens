@@ -24,16 +24,19 @@ deploy_backend:
 deploy_ai_to_hf:
   stage: deploy
   image: alpine:latest
+  variables:
+    # This tells GitLab to fetch the WHOLE history, not just the last commit
+    GIT_DEPTH: "0"
   before_script:
     - apk add --no-cache git
   script:
     - git config --global user.email "tejas@example.com"
     - git config --global user.name "hossie449"
     
-    # CORRECTED: Using HTTPS with Token for authentication
+    # Use the HTTPS URL with your token
     - git remote add hf https://hossie449:$HF_TOKEN@huggingface.co/spaces/hossie449/medilens
     
-    # CORRECTED: Pushing current code (HEAD) to Hugging Face main branch
+    # Pushing the full history to Hugging Face
     - git push --force hf HEAD:main
   only:
     - main
