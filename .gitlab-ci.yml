@@ -23,6 +23,6 @@ deploy_ai_to_hf:
     - |
       curl -X POST https://huggingface.co/api/spaces/hossie449/medilens/restart \
       -H "Authorization: Bearer $HF_TOKEN" \
-      -H "Content-Type: application/json"
+     
   only:
     - main
