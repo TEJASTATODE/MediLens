@@ -12,7 +12,7 @@ app.use((req, res, next) => {
   next();
 });
 app.use(cors({ 
-    origin: "http://localhost:5173", 
+    origin: ["http://localhost:5173", "https://medi-lens-pi.vercel.app"],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"]

@@ -22,8 +22,8 @@ const Detection = () => {
     const canvasRef = useRef(null);
     const streamRef = useRef(null);
 
-    const API_NODE = "http://localhost:5000/api/history";
-    const API_PYTHON = "http://localhost:8000/analyze";
+    const API_NODE = "https://medilens-1.onrender.com/api/history";
+    const API_PYTHON = "https://hossie449-medilens.hf.space/analyze";
 
     const startCamera = async () => {
         setError(null);

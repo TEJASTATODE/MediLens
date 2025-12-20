@@ -5,7 +5,7 @@ import {
   History, Trash2, ShieldCheck, Edit3, X, Save, Plus, RefreshCw, 
   ChevronRight, Pill, UserCircle, ShoppingCart, MapPin, Info, Search,
   ArrowUpRight, Microscope, Zap, Database, Mail, Activity, LayoutGrid,
-  LogOut // Added LogOut icon
+  LogOut
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -26,7 +26,6 @@ const Profile = () => {
 
   const categories = ["All", "Verified", "Recent", "Chemicals"];
 
-  // --- LOGOUT LOGIC ---
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
