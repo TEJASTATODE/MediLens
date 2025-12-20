@@ -14,29 +14,15 @@ build_backend:
     - docker push $CI_REGISTRY_IMAGE/backend:latest
 
 # 2. Deploy Node Backend to Render
-deploy_backend:
+deploy_ai_to_hf:
   stage: deploy
   image: curlimages/curl:latest
   script:
-    - curl -X POST $RENDER_DEPLOY_HOOK
-
-# 3. Deploy AI Engine to Hugging Face
-deploy_ai_to_hf:
-  stage: deploy
-  image: alpine:latest
-  variables:
-    # This tells GitLab to fetch the WHOLE history, not just the last commit
-    GIT_DEPTH: "0"
-  before_script:
-    - apk add --no-cache git
-  script:
-    - git config --global user.email "tejas@example.com"
-    - git config --global user.name "hossie449"
-    
-    # Use the HTTPS URL with your token
-    - git remote add hf https://hossie449:$HF_TOKEN@huggingface.co/spaces/hossie449/medilens
-    
-    # Pushing the full history to Hugging Face
-    - git push --force hf HEAD:main
+    - echo "Force-triggering Hugging Face Factory Rebuild..."
+    # This API call tells Hugging Face to pull the latest code and rebuild everything
+    - |
+      curl -X POST https://huggingface.co/api/spaces/hossie449/medilens/rebuild \
+      -H "Authorization: Bearer $HF_TOKEN" \
+      -H "Content-Type: application/json"
   only:
     - main
