@@ -30,7 +30,8 @@ deploy_ai_to_hf:
     - git config --global user.email "tejas@example.com"
     - git config --global user.name "hossie449"
     # FIXED: Just your username and your token. No extra text!
-    - git remote add hf https://hossie449:$HF_TOKEN@huggingface.co/spaces/hossie449/medilens
+    - git remote set-url origin https://hossie449:$HF_TOKEN@huggingface.co/spaces/hossie449/medilens
+    - git pull origin
     - git push --force hf HEAD:main
   only:
     - main
