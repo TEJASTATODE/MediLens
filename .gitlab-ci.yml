@@ -2,7 +2,6 @@ stages:
   - build
   - deploy
 
-# 1. Build Node Backend for Render
 build_backend:
   stage: build
   image: docker:24.0.5
@@ -13,13 +12,12 @@ build_backend:
     - docker build -t $CI_REGISTRY_IMAGE/backend:latest ./backend
     - docker push $CI_REGISTRY_IMAGE/backend:latest
 
-# 2. Deploy Node Backend to Render
 deploy_ai_to_hf:
   stage: deploy
   image: curlimages/curl:latest
   script:
     - echo "Force-triggering Hugging Face Factory Rebuild..."
-    # This API call tells Hugging Face to pull the latest code and rebuild everything
+    
     - |
       curl -X POST https://huggingface.co/api/spaces/hossie449/medilens/restart \
       -H "Authorization: Bearer $HF_TOKEN" \
