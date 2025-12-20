@@ -8,3 +8,4 @@ secrets.json
 backend/.env
 frontend/.env
 MLbackend/.env
+.vscode

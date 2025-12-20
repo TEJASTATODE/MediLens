@@ -309,6 +309,9 @@ const Profile = () => {
                       <div className="mt-4 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-700 bg-white px-4 py-2 rounded-xl shadow-sm border border-green-100">
                         Prescribed Dosage: {selectedScan.dosage}
                       </div>
+                      <div className="mt-4 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-700 bg-white px-4 py-2 rounded-xl shadow-sm border border-green-100">
+                        Side Effects: {selectedScan.side_effects}
+                      </div>
                     </div>
                   </div>
 

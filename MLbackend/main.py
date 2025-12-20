@@ -35,12 +35,12 @@ ocr = PaddleOCR(
 )
 
 def preprocess_image(img):
-    # 1. Resize (important)
+   
     img = cv2.resize(img, None, fx=1.5, fy=1.5, interpolation=cv2.INTER_CUBIC)
 
-    # 2. Grayscale
+  
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # 4. Normalize contrast (safe)
+    
     gray = cv2.normalize(gray, None, 0, 255, cv2.NORM_MINMAX)
     kernel = np.array([
     [ 0, -1,  0],
@@ -87,17 +87,17 @@ async def analyze_image(file: UploadFile = File(...)):
        
         full_text = " ".join(extracted_texts)
         prompt = f"""
-Act as a professional medical assistant. I have scanned a medicine label. 
+Act as a professional medical doctor. I have scanned a medicine label. 
 Based on the EXTRACTED TEXT below, identify the medicine. 
 If specific fields like 'usage' or 'side_effects' are missing from the text but you recognize the medicine name, use your medical knowledge to provide accurate information,also provide the generic name and alternatives and fetch best buy link for medicine.
 Return ONLY a valid JSON object:
 {{
   "medicineName": "Full name of medicine",
   "composition": "Ingredients",
-  "usage": "Primary use",
+  "usage": "detailed medical usage with examples and under what conditions it is used in simple language",
   "dosage": "Standard dosage",
   "manufacturer": "Company name",
-  "side_effects": "Common side effects",
+  "side_effects": " Common side effects in detailed format",
   "warning": "Safety warnings",
   "buy_link": "URL",
   "alternatives": "Provide an ARRAY of strings (e.g., [\"Med A\", \"Med B\"]) containing generic medicines with the same composition.",

@@ -6,7 +6,8 @@ import {
   Camera, Pill, AlertCircle, X, History, User, 
   ChevronLeft, Loader2, Save, Trash2, ArrowRight, 
   RefreshCcw, Zap, Info, ShieldCheck, Microscope,
-  Maximize, Scan, Sparkles, HandMetal, Lightbulb
+  Maximize, Scan, Sparkles, HandMetal, Lightbulb,
+  Stethoscope, Activity, Thermometer
 } from 'lucide-react';
 
 const Detection = () => {
@@ -29,20 +30,18 @@ const Detection = () => {
         try {
             if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop());
             
-            // OPTIMIZED: High resolution (4K ideal) and wider aspect ratio for mobile
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: { 
                     facingMode: "environment", 
-                    width: { ideal: 3840 }, 
-                    height: { ideal: 2160 },
-                    aspectRatio: { ideal: 1.777 } // 16:9 for wider view
+                    width: { ideal: 1920 }, 
+                    height: { ideal: 1080 },
                 }
             });
             streamRef.current = stream;
             if (videoRef.current) {
                 videoRef.current.srcObject = stream;
             }
-        } catch (err) { setError("Camera hardware not detected or permission denied."); }
+        } catch (err) { setError("Camera hardware not detected."); }
     };
 
     useEffect(() => {
@@ -57,16 +56,26 @@ const Detection = () => {
         const video = videoRef.current;
         const canvas = canvasRef.current;
         
-        // OPTIMIZED: Capture at full hardware resolution
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
+        // Logical "Zoom": We calculate the center area (where the blue box is)
+        // and only draw that portion to the canvas.
+        const scale = video.videoWidth / video.offsetWidth;
+        
+        // Define the scanning area (The blue HUD size)
+        const scanWidth = 400 * scale; 
+        const scanHeight = 250 * scale;
+        const startX = (video.videoWidth - scanWidth) / 2;
+        const startY = (video.videoHeight - scanHeight) / 2;
+
+        canvas.width = scanWidth;
+        canvas.height = scanHeight;
         
         const ctx = canvas.getContext('2d');
-        // Apply slight sharpening filter for OCR
-        ctx.filter = 'contrast(1.1) brightness(1.05)';
-        ctx.drawImage(video, 0, 0);
+        ctx.filter = 'contrast(1.1) brightness(1.02) saturate(1.1)';
         
-        const dataUrl = canvas.toDataURL('image/jpeg', 1.0); // Max quality
+        // Draw only the center part of the video (The 'Zoomed' effect)
+        ctx.drawImage(video, startX, startY, scanWidth, scanHeight, 0, 0, scanWidth, scanHeight);
+        
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
         setImage(dataUrl);
         streamRef.current?.getTracks().forEach(t => t.stop());
     };
@@ -97,121 +106,111 @@ const Detection = () => {
                 });
             }
         } catch (err) {
-            setError("Vision AI failed to interpret the text. Ensure lighting is sufficient.");
+            setError("Analysis failed. Please try again with better lighting.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#FDFDFF] font-sans antialiased text-slate-900 overflow-hidden">
-            <header className="fixed top-0 left-0 right-0 z-[60] bg-white/70 backdrop-blur-xl border-b border-slate-100 px-6 py-4">
+        <div className="min-h-screen bg-[#F8FAFC] font-sans antialiased text-slate-900">
+            {/* --- HEADER --- */}
+            <header className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-6 py-4">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-4">
                         <motion.button 
                             whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
                             onClick={() => navigate('/profile')}
-                            className="p-2.5 hover:bg-slate-50 rounded-2xl transition-all"
+                            className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
                         >
-                            <ChevronLeft size={24} className="text-slate-600" />
+                            <ChevronLeft size={20} className="text-slate-600" />
                         </motion.button>
-                        <div className="h-8 w-[1px] bg-slate-200 mx-2" />
-                        <div className="flex items-center gap-3">
-                            <div className="bg-blue-600 p-2 rounded-xl text-white shadow-lg shadow-blue-200">
-                                <Scan size={20} />
+                        <div className="flex items-center gap-2">
+                            <div className="bg-blue-600 p-1.5 rounded-lg text-white">
+                                <Scan size={18} />
                             </div>
-                            <h1 className="text-lg font-black tracking-tight">MediLens <span className="text-blue-600">Pro</span></h1>
+                            <h1 className="text-md font-bold tracking-tight text-slate-800">MediLens <span className="text-blue-600">Analyser</span></h1>
                         </div>
                     </div>
                 </div>
             </header>
 
-            <main className="pt-24 pb-8 px-4 max-w-7xl mx-auto h-screen flex flex-col lg:flex-row gap-6">
+            <main className="pt-24 pb-8 px-4 max-w-7xl mx-auto h-[calc(100vh-20px)] flex flex-col lg:flex-row gap-6">
                 
-                {/* ─── LEFT: CAMERA INTERFACE (Enhanced Resolution/View) ─── */}
-                <div className="w-full lg:w-1/2 xl:w-[60%] relative flex flex-col min-h-[400px]">
-                    <div className="relative flex-1 bg-slate-900 rounded-[32px] md:rounded-[40px] overflow-hidden shadow-2xl border-4 md:border-[8px] border-white ring-1 ring-slate-200 group">
-                        
+                {/* --- LEFT: SMART SCANNER --- */}
+                <div className="w-full lg:w-[55%] relative flex flex-col">
+                    <div className="relative flex-1 bg-black rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white ring-1 ring-slate-200">
                         <AnimatePresence mode="wait">
                             {!image ? (
                                 <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative h-full w-full">
-                                    <video ref={videoRef} className="w-full h-full object-cover md:object-contain bg-black" autoPlay muted playsInline />
+                                    <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
                                     
-                                    {/* Flash Effect */}
-                                    <AnimatePresence>
-                                        {isFlashActive && (
-                                            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="absolute inset-0 bg-white z-50" />
-                                        )}
-                                    </AnimatePresence>
-
-                                    {/* --- REMARKS / STABILITY OVERLAY --- */}
-                                    <div className="absolute top-6 left-6 right-6 flex flex-col gap-2 pointer-events-none">
-                                        <motion.div 
-                                            initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }}
-                                            className="bg-black/40 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10 flex items-center gap-3"
-                                        >
-                                            <HandMetal size={18} className="text-yellow-400" />
-                                            <p className="text-white text-[11px] font-bold uppercase tracking-wider">Keep hands stable for sharp OCR</p>
-                                        </motion.div>
-                                        <motion.div 
-                                            initial={{ y: -20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }}
-                                            className="bg-black/40 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/10 flex items-center gap-3"
-                                        >
-                                            <Lightbulb size={18} className="text-blue-400" />
-                                            <p className="text-white text-[11px] font-bold uppercase tracking-wider">Clean strip & avoid glares</p>
-                                        </motion.div>
-                                    </div>
-
-                                    {/* HUD Overlay */}
-                                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-                                        <div className="relative w-72 h-48 md:w-[400px] md:h-64 border-2 border-white/20 rounded-[32px]">
-                                            <div className="absolute -top-1 -left-1 w-12 h-12 border-t-4 border-l-4 border-blue-500 rounded-tl-[24px]" />
-                                            <div className="absolute -top-1 -right-1 w-12 h-12 border-t-4 border-r-4 border-blue-500 rounded-tr-[24px]" />
-                                            <div className="absolute -bottom-1 -left-1 w-12 h-12 border-b-4 border-l-4 border-blue-500 rounded-bl-[24px]" />
-                                            <div className="absolute -bottom-1 -right-1 w-12 h-12 border-b-4 border-r-4 border-blue-500 rounded-br-[24px]" />
+                                    {/* Scanning HUD Overlay */}
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <div className="relative w-[320px] h-[200px] md:w-[450px] md:h-[280px]">
+                                            {/* Corner Accents */}
+                                            <div className="absolute -top-2 -left-2 w-10 h-10 border-t-4 border-l-4 border-blue-500 rounded-tl-xl" />
+                                            <div className="absolute -top-2 -right-2 w-10 h-10 border-t-4 border-r-4 border-blue-500 rounded-tr-xl" />
+                                            <div className="absolute -bottom-2 -left-2 w-10 h-10 border-b-4 border-l-4 border-blue-500 rounded-bl-xl" />
+                                            <div className="absolute -bottom-2 -right-2 w-10 h-10 border-b-4 border-r-4 border-blue-500 rounded-br-xl" />
                                             
+                                            {/* Animated Scan Line */}
                                             <motion.div 
-                                                animate={{ scale: [1, 1.05, 1], opacity: [0.2, 0.4, 0.2] }}
-                                                transition={{ duration: 3, repeat: Infinity }}
-                                                className="absolute inset-0 bg-blue-500/5 rounded-[30px]"
+                                                animate={{ top: ['0%', '100%', '0%'] }}
+                                                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+                                                className="absolute left-0 right-0 h-0.5 bg-blue-400/50 shadow-[0_0_15px_rgba(59,130,246,0.5)] z-10"
                                             />
                                         </div>
                                     </div>
 
-                                    {/* Capture Button */}
-                                    <div className="absolute bottom-8 left-0 right-0 flex justify-center items-center">
+                                    {/* Hints */}
+                                    <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-2">
+                                        <div className="bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 flex items-center gap-2">
+                                            <Lightbulb size={14} className="text-yellow-400" />
+                                            <p className="text-white text-[10px] font-bold uppercase tracking-wider">Center Medicine Strip</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Capture UI */}
+                                    <div className="absolute bottom-10 left-0 right-0 flex justify-center">
                                         <motion.button 
-                                            whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}
+                                            whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.9 }}
                                             onClick={capturePhoto}
-                                            className="w-20 h-20 bg-white rounded-full p-1.5 shadow-2xl transition-all"
+                                            className="group relative"
                                         >
-                                            <div className="w-full h-full rounded-full border-4 border-slate-900 flex items-center justify-center">
-                                                <div className="w-12 h-12 bg-slate-900 rounded-full" />
+                                            <div className="absolute inset-0 bg-blue-500 blur-2xl opacity-20 group-hover:opacity-40 transition-opacity" />
+                                            <div className="relative w-20 h-20 bg-white rounded-full p-1 shadow-2xl">
+                                                <div className="w-full h-full rounded-full border-[3px] border-slate-900 flex items-center justify-center">
+                                                    <div className="w-14 h-14 bg-slate-900 rounded-full flex items-center justify-center text-white">
+                                                        <Camera size={24} />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </motion.button>
                                     </div>
                                 </motion.div>
                             ) : (
-                                <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative h-full w-full bg-black">
-                                    <img src={image} className="w-full h-full object-contain" alt="Captured" />
-                                    <div className="absolute top-6 right-6">
+                                <motion.div key="preview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative h-full w-full bg-slate-900 flex items-center justify-center">
+                                    <img src={image} className="max-w-[90%] max-h-[80%] rounded-2xl shadow-2xl border-4 border-white/10" alt="Captured" />
+                                    
+                                    <div className="absolute top-6 right-6 flex gap-3">
                                         <button 
                                             onClick={() => { setImage(null); setResult(null); }}
-                                            className="bg-white p-4 rounded-2xl text-slate-800 shadow-xl hover:bg-rose-500 hover:text-white transition-all border border-white"
+                                            className="bg-white/10 backdrop-blur-md p-3 rounded-2xl text-white hover:bg-rose-500 transition-all border border-white/20"
                                         >
                                             <RefreshCcw size={20} />
                                         </button>
                                     </div>
 
                                     {!result && !loading && (
-                                        <motion.div initial={{ y: 20 }} animate={{ y: 0 }} className="absolute bottom-8 left-8 right-8">
+                                        <div className="absolute bottom-8 left-8 right-8">
                                             <button 
                                                 onClick={analyzeAndSave}
-                                                className="w-full py-5 bg-blue-600 text-white rounded-[24px] font-black uppercase tracking-widest text-xs shadow-2xl flex items-center justify-center gap-3"
+                                                className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-sm shadow-xl flex items-center justify-center gap-3 transition-all"
                                             >
-                                                <Sparkles size={20} /> Analyze Clear Image
+                                                <Sparkles size={18} /> Confirm & Analyze
                                             </button>
-                                        </motion.div>
+                                        </div>
                                     )}
                                 </motion.div>
                             )}
@@ -219,66 +218,96 @@ const Detection = () => {
                     </div>
                 </div>
 
-                {/* ─── RIGHT: DIAGNOSTIC REPORT (Condensed for Mobile) ─── */}
-                <div className="w-full lg:w-1/2 xl:w-[40%] flex flex-col overflow-hidden">
-                    <div className="bg-white rounded-[32px] md:rounded-[44px] p-6 md:p-8 border border-slate-100 shadow-xl flex-1 overflow-y-auto scrollbar-hide">
+                {/* --- RIGHT: DIAGNOSTIC INSIGHTS --- */}
+                <div className="w-full lg:w-[45%] flex flex-col">
+                    <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-xl flex-1 flex flex-col overflow-hidden">
                         <AnimatePresence mode="wait">
                             {loading ? (
-                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="h-full flex flex-col items-center justify-center text-center py-12">
-                                    <Loader2 className="animate-spin text-blue-600 mb-6" size={48} />
-                                    <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter">AI Processing...</h3>
-                                    <p className="text-slate-400 mt-2 text-xs font-bold uppercase tracking-widest">Identifying chemical compounds</p>
+                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                    <div className="relative mb-8">
+                                        <Loader2 className="animate-spin text-blue-600" size={64} strokeWidth={1} />
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <Microscope size={24} className="text-blue-400" />
+                                        </div>
+                                    </div>
+                                    <h3 className="text-xl font-bold text-slate-900">Decoding Composition</h3>
+                                    <p className="text-slate-500 mt-2 text-sm max-w-[240px]">Our Egine is cross-referencing chemical compounds...</p>
                                 </motion.div>
                             ) : result ? (
-                                <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
-                                    <div className="flex justify-between items-center">
-                                        <div className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-[9px] font-black uppercase border border-green-100 flex items-center gap-1.5">
-                                            <ShieldCheck size={12} /> High Accuracy
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide">
+                                    {/* Identity Header */}
+                                    <div className="flex items-start justify-between">
+                                        <div>
+                                            <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase mb-3 border border-green-100">
+                                                <ShieldCheck size={12} /> Verified Analysis
+                                            </div>
+                                            <h2 className="text-3xl font-extrabold text-slate-900 tracking-tight leading-none">{result.medicineName}</h2>
+                                            <p className="text-blue-600 font-semibold text-xs mt-2 uppercase tracking-widest">{result.manufacturer}</p>
+                                        </div>
+                                        <div className="bg-slate-50 p-4 rounded-2xl">
+                                            <Pill className="text-blue-600" size={28} />
                                         </div>
                                     </div>
 
-                                    <div>
-                                        <h2 className="text-3xl font-black text-slate-900 tracking-tighter mb-1">{result.medicineName}</h2>
-                                        <p className="text-blue-600 font-bold text-xs uppercase tracking-widest">{result.manufacturer || "Certified Product"}</p>
-                                    </div>
-
-                                    <div className="grid grid-cols-2 gap-3">
-                                        <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Dosage</span>
-                                            <div className="text-xs font-black text-slate-900">{result.dosage}</div>
+                                    {/* Quick Stats Grid */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50">
+                                            <div className="flex items-center gap-2 mb-2 text-blue-700">
+                                                <Activity size={16} />
+                                                <span className="text-[10px] font-bold uppercase">Usage</span>
+                                            </div>
+                                            <p className="text-xs font-bold text-slate-700 leading-snug">{result.usage}</p>
                                         </div>
-                                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                                        <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest block mb-1">Side Effects</span>
-                                        <div className="text-xs font-black text-slate-900">{result.side_effects}</div>
-                                    </div>
-                                    </div>
- 
-                                    <div className="p-5 bg-white border border-slate-100 rounded-2xl shadow-sm">
-                                        <h4 className="text-[10px] font-black uppercase text-slate-900 mb-2">Molecular Build</h4>
-                                        <p className="text-xs text-slate-600 leading-relaxed">{result.composition}</p>
+                                        <div className="p-4 bg-purple-50/50 rounded-2xl border border-purple-100/50">
+                                            <div className="flex items-center gap-2 mb-2 text-purple-700">
+                                                <Thermometer size={16} />
+                                                <span className="text-[10px] font-bold uppercase">Dosage</span>
+                                            </div>
+                                            <p className="text-xs font-bold text-slate-700 leading-snug">{result.dosage}</p>
+                                        </div>
                                     </div>
 
-                                    <div className="p-5 bg-rose-50 border border-rose-100 rounded-2xl">
-                                        <h4 className="text-[10px] font-black uppercase text-rose-800 mb-2">Warning</h4>
-                                        <p className="text-[11px] font-bold text-rose-700 leading-relaxed italic">{result.warning}</p>
+                                    {/* Detailed Composition */}
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-slate-400">
+                                            <Stethoscope size={14} />
+                                            <span className="text-[10px] font-bold uppercase tracking-widest">Medical Build</span>
+                                        </div>
+                                        <div className="p-5 bg-slate-50 rounded-2xl text-xs text-slate-600 leading-relaxed border border-slate-100">
+                                            {result.composition}
+                                        </div>
                                     </div>
 
+                                    {/* Critical Warning */}
+                                    <div className="relative group overflow-hidden">
+                                        <div className="absolute inset-0 bg-rose-500/5 group-hover:bg-rose-500/10 transition-colors" />
+                                        <div className="relative p-5 border-l-4 border-rose-500 bg-rose-50/30 rounded-r-2xl">
+                                            <div className="flex items-center gap-2 text-rose-700 mb-2">
+                                                <AlertCircle size={16} />
+                                                <span className="text-[10px] font-black uppercase">Contraindications</span>
+                                            </div>
+                                            <p className="text-[11px] font-bold text-rose-800 leading-relaxed italic">{result.warning}</p>
+                                        </div>
+                                    </div>
+
+                                    {/* Action Footer */}
                                     <button 
                                         onClick={() => navigate('/profile')}
-                                        className="w-full py-5 bg-slate-900 text-white rounded-[20px] font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3"
+                                        className="w-full mt-4 group relative py-4 bg-slate-900 text-white rounded-2xl overflow-hidden transition-all active:scale-[0.98]"
                                     >
-                                        Save To History <ArrowRight size={16} />
+                                        <div className="relative z-10 flex items-center justify-center gap-3">
+                                            <span className="text-xs font-bold uppercase tracking-widest">Save to Digital Health Profile</span>
+                                            <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
+                                        </div>
                                     </button>
                                 </motion.div>
                             ) : (
-                                <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-                                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center border border-slate-100">
-                                        <Camera className="text-slate-300" size={32} />
+                                <div className="flex-1 flex flex-col items-center justify-center p-12 text-center">
+                                    <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6 border border-slate-100">
+                                        <Scan className="text-slate-300" size={40} />
                                     </div>
-                                    <div>
-                                        <h3 className="text-lg font-black text-slate-900 uppercase">Awaiting Scan</h3>
-                                        <p className="text-slate-400 mt-2 text-xs font-medium">Please align medicine strip within the blue guide for AI extraction.</p>
-                                    </div>
+                                    <h3 className="text-lg font-bold text-slate-900">Scanner Ready</h3>
+                                    <p className="text-slate-400 mt-2 text-sm max-w-[200px]">Align the medication strip in the viewfinder to begin AI analysis.</p>
                                 </div>
                             )}
                         </AnimatePresence>
