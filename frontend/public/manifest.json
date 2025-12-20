@@ -1,0 +1,15 @@
+{
+  "short_name": "MediLens",
+  "name": "MediLens AI Pharmaceutical Analysis",
+  "icons": [
+    {
+      "src": "logo.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ],
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#2563eb",
+  "background_color": "#ffffff"
+}
