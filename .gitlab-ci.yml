@@ -27,10 +27,11 @@ deploy_ai_to_hf:
   before_script:
     - apk add --no-cache git
   script:
-    # Replace 'your-username' and 'your-space-name' with your actual HF details
     - git config --global user.email "tejas@example.com"
-    - git config --global user.name "Tejas Tatode"
-    - git remote add hf https://TEJASTATODE:$HF_TOKEN@huggingface.co/spaces/hossie449/medilens
-    - git push --force hf main
+    - git config --global user.name "hossie449"
+    # Corrected Remote URL
+    - git remote add hf https://hossie449:$HF_TOKEN@huggingface.co/spaces/hossie449/medilens
+    # Pushing the current code (HEAD) to HF main branch
+    - git push --force hf HEAD:main
   only:
     - main
