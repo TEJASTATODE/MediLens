@@ -100,7 +100,7 @@ const Login = () => {
               onSuccess={() => {}}
               theme="filled_blue"
               shape="pill"
-              width="300"
+              width="320px"
             />
           </div>
 
