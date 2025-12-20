@@ -34,9 +34,9 @@ const SignUp = () => {
   return (
     <div className="min-h-screen bg-[#FBFBFE] flex flex-col md:flex-row font-sans overflow-hidden">
       
-      {/* ─── LEFT SIDE: BRAND & FEATURES ─── */}
+     
       <div className="hidden md:flex w-[40%] bg-[#007AFF] p-12 flex-col justify-between text-white relative">
-        {/* Abstract Background Animation */}
+       
         <motion.div 
           animate={{ rotate: 360 }}
           transition={{ duration: 50, repeat: Infinity, ease: "linear" }}
@@ -57,7 +57,7 @@ const SignUp = () => {
           </h2>
           <p className="text-blue-100/80 mb-10">Empowering healthcare professionals and patients with cutting-edge AI technology for accurate medication insights.</p>          
           <div className="space-y-10">
-            {/* Feature 1 */}
+       
             <div className="flex gap-5">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center shrink-0 border border-white/20">
                 <ScanEye size={24} />
@@ -68,7 +68,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            {/* Feature 2 */}
+      
             <div className="flex gap-5">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center shrink-0 border border-white/20">
                 <BrainCircuit size={24} />
@@ -79,7 +79,6 @@ const SignUp = () => {
               </div>
             </div>
 
-            {/* Feature 3 */}
             <div className="flex gap-5">
               <div className="w-12 h-12 bg-white/10 backdrop-blur-lg rounded-xl flex items-center justify-center shrink-0 border border-white/20">
                 <Activity size={24} />
@@ -98,10 +97,9 @@ const SignUp = () => {
         </div>
       </div>
 
-      {/* ─── RIGHT SIDE: SIGN UP FORM ─── */}
       <div className="flex-1 flex flex-col items-center justify-center p-8 md:p-20 relative bg-white">
         
-        {/* Mobile Logo Only */}
+     
         <div className="md:hidden mb-10 flex items-center gap-3">
           <Stethoscope className="text-[#007AFF]" size={32} />
           <h1 className="text-2xl font-bold text-slate-900">MediLens</h1>
@@ -114,7 +112,7 @@ const SignUp = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Input Group: Name */}
+        
             <div className="space-y-2">
               <label className="text-[13px] font-bold text-slate-600 ml-1">Full Name</label>
               <div className="relative group">
@@ -130,7 +128,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            {/* Input Group: Email */}
+        
             <div className="space-y-2">
               <label className="text-[13px] font-bold text-slate-600 ml-1">Email Address</label>
               <div className="relative group">
@@ -146,7 +144,7 @@ const SignUp = () => {
               </div>
             </div>
 
-            {/* Input Group: Password */}
+         
             <div className="space-y-2">
               <label className="text-[13px] font-bold text-slate-600 ml-1">Security Password</label>
               <div className="relative group">

@@ -3,7 +3,6 @@ const { verifyToken } = require("../utils/jwt");
 const protect = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
-  // Debug: If you get a 401, check your terminal to see if the header arrived
   if (!authHeader) {
     console.log("⚠️ No Authorization header found in request");
   }

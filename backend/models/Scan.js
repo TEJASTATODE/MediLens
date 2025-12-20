@@ -38,9 +38,9 @@ const scanSchema = new mongoose.Schema({
   buy_link: { type: String },
   generic_name: { type: String },
   alternatives: [String]
-}, // <--- Close the first object (Fields)
+}, 
 { 
-  timestamps: true // <--- Start the second object (Options)
+  timestamps: true 
 });
 
 module.exports = mongoose.model("Scan", scanSchema);

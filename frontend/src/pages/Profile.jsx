@@ -131,7 +131,7 @@ const Profile = () => {
                 <button onClick={() => navigate("/scan")} className="bg-slate-900 text-white px-8 py-4 rounded-[22px] font-black uppercase tracking-widest text-[11px] flex items-center gap-3 hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">
                   <Plus size={18} /> Launch Analysis
                 </button>
-                {/* --- LOGOUT BUTTON ADDED HERE --- */}
+               
                 <button onClick={handleLogout} className="bg-white text-rose-600 border border-rose-100 px-8 py-4 rounded-[22px] font-black uppercase tracking-widest text-[11px] flex items-center gap-3 hover:bg-rose-50 transition-all">
                   <LogOut size={18} /> End Session
                 </button>
@@ -158,9 +158,6 @@ const Profile = () => {
           </motion.div>
         </section>
 
-        {/* ... (rest of the component remains exactly the same) */}
-        
-        {/* --- CLINICAL ARCHIVE SECTION --- */}
         <div className="space-y-10 pt-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 px-2">
             <div className="space-y-4">
@@ -267,7 +264,7 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* --- CLINICAL DETAILS MODAL --- */}
+     
       <AnimatePresence>
         {selectedScan && (
           <div className="fixed inset-0 flex items-center justify-center p-4 z-[110]">
@@ -346,7 +343,6 @@ const Profile = () => {
         )}
       </AnimatePresence>
 
-      {/* --- EDIT IDENTITY MODAL --- */}
       <AnimatePresence>
         {isEditing && (
           <div className="fixed inset-0 flex items-center justify-center p-4 z-[100]">

@@ -55,12 +55,7 @@ const Detection = () => {
 
         const video = videoRef.current;
         const canvas = canvasRef.current;
-        
-        // Logical "Zoom": We calculate the center area (where the blue box is)
-        // and only draw that portion to the canvas.
         const scale = video.videoWidth / video.offsetWidth;
-        
-        // Define the scanning area (The blue HUD size)
         const scanWidth = 400 * scale; 
         const scanHeight = 250 * scale;
         const startX = (video.videoWidth - scanWidth) / 2;
@@ -71,8 +66,6 @@ const Detection = () => {
         
         const ctx = canvas.getContext('2d');
         ctx.filter = 'contrast(1.1) brightness(1.02) saturate(1.1)';
-        
-        // Draw only the center part of the video (The 'Zoomed' effect)
         ctx.drawImage(video, startX, startY, scanWidth, scanHeight, 0, 0, scanWidth, scanHeight);
         
         const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
@@ -114,7 +107,6 @@ const Detection = () => {
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] font-sans antialiased text-slate-900">
-            {/* --- HEADER --- */}
             <header className="fixed top-0 left-0 right-0 z-[60] bg-white/80 backdrop-blur-md border-b border-slate-200/60 px-6 py-4">
                 <div className="max-w-7xl mx-auto flex justify-between items-center">
                     <div className="flex items-center gap-4">
@@ -136,8 +128,7 @@ const Detection = () => {
             </header>
 
             <main className="pt-24 pb-8 px-4 max-w-7xl mx-auto h-[calc(100vh-20px)] flex flex-col lg:flex-row gap-6">
-                
-                {/* --- LEFT: SMART SCANNER --- */}
+
                 <div className="w-full lg:w-[55%] relative flex flex-col">
                     <div className="relative flex-1 bg-black rounded-[2.5rem] overflow-hidden shadow-2xl border-8 border-white ring-1 ring-slate-200">
                         <AnimatePresence mode="wait">
@@ -145,16 +136,15 @@ const Detection = () => {
                                 <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative h-full w-full">
                                     <video ref={videoRef} className="w-full h-full object-cover" autoPlay muted playsInline />
                                     
-                                    {/* Scanning HUD Overlay */}
+                              
                                     <div className="absolute inset-0 flex items-center justify-center">
                                         <div className="relative w-[320px] h-[200px] md:w-[450px] md:h-[280px]">
-                                            {/* Corner Accents */}
+                                    
                                             <div className="absolute -top-2 -left-2 w-10 h-10 border-t-4 border-l-4 border-blue-500 rounded-tl-xl" />
                                             <div className="absolute -top-2 -right-2 w-10 h-10 border-t-4 border-r-4 border-blue-500 rounded-tr-xl" />
                                             <div className="absolute -bottom-2 -left-2 w-10 h-10 border-b-4 border-l-4 border-blue-500 rounded-bl-xl" />
                                             <div className="absolute -bottom-2 -right-2 w-10 h-10 border-b-4 border-r-4 border-blue-500 rounded-br-xl" />
-                                            
-                                            {/* Animated Scan Line */}
+                                 
                                             <motion.div 
                                                 animate={{ top: ['0%', '100%', '0%'] }}
                                                 transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
@@ -163,7 +153,6 @@ const Detection = () => {
                                         </div>
                                     </div>
 
-                                    {/* Hints */}
                                     <div className="absolute top-6 left-1/2 -translate-x-1/2 flex gap-2">
                                         <div className="bg-black/50 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 flex items-center gap-2">
                                             <Lightbulb size={14} className="text-yellow-400" />
@@ -171,7 +160,6 @@ const Detection = () => {
                                         </div>
                                     </div>
 
-                                    {/* Capture UI */}
                                     <div className="absolute bottom-10 left-0 right-0 flex justify-center">
                                         <motion.button 
                                             whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.9 }}
@@ -218,7 +206,6 @@ const Detection = () => {
                     </div>
                 </div>
 
-                {/* --- RIGHT: DIAGNOSTIC INSIGHTS --- */}
                 <div className="w-full lg:w-[45%] flex flex-col">
                     <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-xl flex-1 flex flex-col overflow-hidden">
                         <AnimatePresence mode="wait">
@@ -235,7 +222,7 @@ const Detection = () => {
                                 </motion.div>
                             ) : result ? (
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide">
-                                    {/* Identity Header */}
+                        
                                     <div className="flex items-start justify-between">
                                         <div>
                                             <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-700 rounded-full text-[10px] font-bold uppercase mb-3 border border-green-100">
@@ -249,7 +236,7 @@ const Detection = () => {
                                         </div>
                                     </div>
 
-                                    {/* Quick Stats Grid */}
+                    
                                     <div className="grid grid-cols-2 gap-4">
                                         <div className="p-4 bg-blue-50/50 rounded-2xl border border-blue-100/50">
                                             <div className="flex items-center gap-2 mb-2 text-blue-700">
@@ -267,7 +254,6 @@ const Detection = () => {
                                         </div>
                                     </div>
 
-                                    {/* Detailed Composition */}
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2 text-slate-400">
                                             <Stethoscope size={14} />
@@ -278,7 +264,6 @@ const Detection = () => {
                                         </div>
                                     </div>
 
-                                    {/* Critical Warning */}
                                     <div className="relative group overflow-hidden">
                                         <div className="absolute inset-0 bg-rose-500/5 group-hover:bg-rose-500/10 transition-colors" />
                                         <div className="relative p-5 border-l-4 border-rose-500 bg-rose-50/30 rounded-r-2xl">
@@ -290,7 +275,6 @@ const Detection = () => {
                                         </div>
                                     </div>
 
-                                    {/* Action Footer */}
                                     <button 
                                         onClick={() => navigate('/profile')}
                                         className="w-full mt-4 group relative py-4 bg-slate-900 text-white rounded-2xl overflow-hidden transition-all active:scale-[0.98]"
@@ -307,7 +291,7 @@ const Detection = () => {
                                         <Scan className="text-slate-300" size={40} />
                                     </div>
                                     <h3 className="text-lg font-bold text-slate-900">Scanner Ready</h3>
-                                    <p className="text-slate-400 mt-2 text-sm max-w-[200px]">Align the medication strip in the viewfinder to begin AI analysis.</p>
+                                    <p className="text-slate-400 mt-2 text-sm max-w-[200px]">Align the medication strip and capture proper image for AI analysis.</p>
                                 </div>
                             )}
                         </AnimatePresence>

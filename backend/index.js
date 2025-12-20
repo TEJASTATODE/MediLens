@@ -7,10 +7,7 @@ const authRoutes=require('./routes/auth');
 const historyRoutes=require('./routes/history');
 const app = express();
 app.use((req, res, next) => {
-  // same-origin-allow-popups is usually enough, but let's ensure it
   res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-  
-  // Try setting this to unsafe-none specifically for development
   res.setHeader("Cross-Origin-Embedder-Policy", "unsafe-none");
   next();
 });

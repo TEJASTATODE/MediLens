@@ -34,7 +34,7 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex items-center justify-center p-6 relative overflow-hidden">
       
-      {/* ─── ANIMATED BACKGROUND BLURS ─── */}
+
       <motion.div 
         animate={{ scale: [1, 1.2, 1], rotate: [0, 90, 0] }}
         transition={{ duration: 20, repeat: Infinity }}
@@ -52,7 +52,7 @@ const Login = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="w-full max-w-[460px] relative z-10"
       >
-        {/* ─── BRANDING ─── */}
+ 
         <div className="flex flex-col items-center mb-12">
           <motion.div 
             whileHover={{ scale: 1.05, rotate: -5 }}
@@ -73,16 +73,15 @@ const Login = () => {
           <p className="text-slate-500 mt-2 font-medium tracking-wide">Advanced AI Pharmaceutical Analysis</p>
         </div>
 
-        {/* ─── LOGIN CARD ─── */}
+   
         <div className="bg-white/80 backdrop-blur-xl rounded-[48px] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.1)] border border-white p-10 md:p-12 relative overflow-hidden">
           
-          {/* Header Status */}
+       
           <div className="flex items-center gap-2 mb-10 bg-blue-50/50 px-4 py-2 rounded-2xl border border-blue-100/50 w-fit">
             <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
             <span className="text-[11px] font-bold text-blue-700 uppercase tracking-widest">Secure-user Portal</span>
           </div>
 
-          {/* Error Message with AnimatePresence */}
           <AnimatePresence>
             {error && (
               <motion.div 
@@ -96,7 +95,6 @@ const Login = () => {
             )}
           </AnimatePresence>
 
-          {/* GOOGLE BUTTON - Refined */}
           <div className="mb-10 hover:scale-[1.01] transition-transform">
             <GoogleLogin
               onSuccess={() => {}}
@@ -112,7 +110,7 @@ const Login = () => {
             <div className="flex-grow border-t border-slate-100"></div>
           </div>
 
-          {/* FORM SETUP */}
+     
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-[12px] font-black text-slate-500 uppercase tracking-wider ml-1">Enter your Email</label>
@@ -178,7 +176,7 @@ const Login = () => {
           </p>
         </div>
         
-        {/* Verification Badges */}
+
         <div className="mt-10 flex items-center justify-center gap-8">
           <div className="flex items-center gap-2 text-slate-400">
             <ShieldCheck className="text-green-500" size={16} />
