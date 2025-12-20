@@ -472,12 +472,9 @@ const Profile = () => {
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 pb-8">
                   <a
-                    href={
-                      selectedScan.nearby_link ||
-                      `https://www.google.com/maps/search/pharmacies+near+me+${encodeURIComponent(
-                        selectedScan.medicineName
-                      )}`
-                    }
+                    href={`https://www.google.com/maps/search/pharmacies+near+me+${encodeURIComponent(
+                      selectedScan.medicineName
+                    )}`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-3 bg-slate-900 text-white py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-slate-200 cursor-pointer"
@@ -486,12 +483,7 @@ const Profile = () => {
                   </a>
 
                   <a
-                    href={
-                      selectedScan.buy_link ||
-                      `https://www.google.com/search?q=buy+${encodeURIComponent(
-                        selectedScan.medicineName
-                      )}+online`
-                    }
+                    href={selectedScan.buy_link}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-3 bg-blue-50 text-blue-700 border border-blue-100 py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-blue-100 transition-all cursor-pointer"
