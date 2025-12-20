@@ -21,7 +21,7 @@ deploy_ai_to_hf:
     - echo "Force-triggering Hugging Face Factory Rebuild..."
     # This API call tells Hugging Face to pull the latest code and rebuild everything
     - |
-      curl -X POST https://huggingface.co/api/spaces/hossie449/medilens/rebuild \
+      curl -X POST https://huggingface.co/api/spaces/hossie449/medilens/restart \
       -H "Authorization: Bearer $HF_TOKEN" \
       -H "Content-Type: application/json"
   only:
