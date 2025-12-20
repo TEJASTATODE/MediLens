@@ -5,7 +5,7 @@ import {
   History, Trash2, ShieldCheck, Edit3, X, Save, Plus, RefreshCw, 
   ChevronRight, Pill, UserCircle, ShoppingCart, MapPin, Info, Search,
   ArrowUpRight, Microscope, Zap, Database, Mail, Activity, LayoutGrid,
-  LogOut
+  LogOut 
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -329,10 +329,14 @@ const Profile = () => {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-4 pb-8">
-                  <button className="flex items-center justify-center gap-3 bg-slate-900 text-white py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">
+                  <button onClick={() => {
+                    const query = `pharmacies near me selling ${selectedScan.medicineName}`;
+                    window.open(`https://www.google.com/maps/search/${encodeURIComponent(query)}`, '_blank');
+                  }}
+                  className="flex items-center justify-center gap-3 bg-slate-900 text-white py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-blue-600 transition-all shadow-xl shadow-slate-200">
                     <MapPin size={18} /> Nearby Stores
                   </button>
-                  <a href={`https://www.google.com/search?q=buy+${selectedScan.medicineName}`} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-blue-50 text-blue-700 border border-blue-100 py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-blue-100 transition-all">
+                  <a href={selectedScan.buy_link} target="_blank" rel="noreferrer" className="flex items-center justify-center gap-3 bg-blue-50 text-blue-700 border border-blue-100 py-5 rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-blue-100 transition-all">
                     <ShoppingCart size={18} /> Buy Online
                   </a>
                 </div>
