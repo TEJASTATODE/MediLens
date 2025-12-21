@@ -15,6 +15,29 @@ const Login = () => {
   const [error, setError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
+  const handleGoogleSuccess = async (credentialResponse) => {
+    setLoading(true);
+    setError("");
+    try {
+      
+      const res = await api.post("/auth/google", { 
+        credential: credentialResponse.credential 
+      });
+      
+      localStorage.setItem("user", JSON.stringify(res.data.user));
+      localStorage.setItem("token", res.data.token);
+      navigate("/profile");
+    } catch (err) {
+      setError(err.response?.data?.message || "Google Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleError = () => {
+    setError("Google Authentication encountered an error.");
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -97,7 +120,8 @@ const Login = () => {
 
           <div className="mb-10 hover:scale-[1.01] transition-transform">
             <GoogleLogin
-              onSuccess={() => {}}
+             onSuccess={handleGoogleSuccess} 
+              onError={handleGoogleError}    
               theme="filled_blue"
               shape="pill"
               width="320px"
