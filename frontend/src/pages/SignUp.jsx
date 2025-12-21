@@ -18,17 +18,16 @@ const SignUp = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // --- START: UPDATED GOOGLE HANDLE ---
   const handleGoogleSuccess = async (credentialResponse) => {
     setLoading(true);
     setError("");
     try {
-      // Sends the Google JWT to your backend for verification
+      
       const res = await api.post("/auth/google-login", {
         token: credentialResponse.credential,
       });
       
-      // Store the JWT returned by YOUR backend
+  
       localStorage.setItem("token", res.data.token);
       navigate("/dashboard");
     } catch (err) {
@@ -41,7 +40,7 @@ const SignUp = () => {
   const handleGoogleError = () => {
     setError("Google Sign-In was unsuccessful. Please try again.");
   };
-  // --- END: UPDATED GOOGLE HANDLE ---
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,8 +58,7 @@ const SignUp = () => {
 
   return (
     <div className="min-h-screen bg-[#FBFBFE] flex flex-col md:flex-row font-sans overflow-hidden">
-      
-      {/* Left Sidebar Content (Unchanged) */}
+
       <div className="hidden md:flex w-[40%] bg-[#007AFF] p-12 flex-col justify-between text-white relative">
         <motion.div 
           animate={{ rotate: 360 }}
@@ -127,7 +125,6 @@ const SignUp = () => {
             <p className="text-slate-500 mt-2 font-medium">Begin your secure medical analysis journey.</p>
           </div>
 
-          {/* Error Message Display */}
           <AnimatePresence>
             {error && (
               <motion.div 
@@ -202,7 +199,7 @@ const SignUp = () => {
           </div>
 
           <div className="flex justify-center">
-            {/* UPDATED COMPONENT WITH HANDLERS */}
+
             <GoogleLogin 
               theme="outline" 
               shape="pill" 
