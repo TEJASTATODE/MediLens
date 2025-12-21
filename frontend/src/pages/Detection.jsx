@@ -9,6 +9,7 @@ import {
   Maximize, Scan, Sparkles, HandMetal, Lightbulb,
   Stethoscope, Activity, Thermometer
 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 const Detection = () => {
     const navigate = useNavigate();
@@ -218,7 +219,7 @@ const Detection = () => {
                                         </div>
                                     </div>
                                     <h3 className="text-xl font-bold text-slate-900">Decoding Composition</h3>
-                                    <p className="text-slate-500 mt-2 text-sm max-w-[240px]">Our Egine is cross-referencing chemical compounds...</p>
+                                    <p className="text-slate-500 mt-2 text-sm max-w-[240px]">Our Engine is cross-referencing chemical compounds...</p>
                                 </motion.div>
                             ) : result ? (
                                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex-1 overflow-y-auto p-8 space-y-6 scrollbar-hide">
@@ -243,7 +244,7 @@ const Detection = () => {
                                                 <Activity size={16} />
                                                 <span className="text-[10px] font-bold uppercase">Usage</span>
                                             </div>
-                                            <p className="text-xs font-bold text-slate-700 leading-snug">{result.usage}</p>
+                                            <p className="text-xs font-bold text-slate-700 leading-snug"><ReactMarkdown>{result.usage}</ReactMarkdown></p>
                                         </div>
                                         <div className="p-4 bg-purple-50/50 rounded-2xl border border-purple-100/50">
                                             <div className="flex items-center gap-2 mb-2 text-purple-700">
