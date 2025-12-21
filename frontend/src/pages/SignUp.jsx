@@ -29,7 +29,7 @@ const SignUp = () => {
       
   
       localStorage.setItem("token", res.data.token);
-      navigate("/profile");
+      navigate("/login");
     } catch (err) {
       setError(err.response?.data?.message || "Google Authentication failed");
     } finally {
