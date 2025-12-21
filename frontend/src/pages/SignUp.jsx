@@ -23,7 +23,7 @@ const SignUp = () => {
     setError("");
     try {
       
-      const res = await api.post("/auth/google-login", {
+      const res = await api.post("/auth/google", {
         token: credentialResponse.credential,
       });
       
@@ -43,6 +43,7 @@ const SignUp = () => {
 
 
   const handleSubmit = async (e) => {
+
     e.preventDefault();
     setLoading(true);
     setError("");
