@@ -27,6 +27,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import ReactMarkdown from 'react-markdown';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -435,13 +436,13 @@ const Profile = () => {
                         Clinical Usage
                       </h4>
                       <p className="text-slate-600 leading-relaxed font-medium">
-                        {selectedScan.usage}
+                        <ReactMarkdown>{selectedScan.usage}</ReactMarkdown>
                       </p>
                       <div className="mt-4 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-700 bg-white px-4 py-2 rounded-xl shadow-sm border border-green-100">
                         Prescribed Dosage: {selectedScan.dosage}
                       </div>
                       <div className="mt-4 inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-green-700 bg-white px-4 py-2 rounded-xl shadow-sm border border-green-100">
-                        Side Effects: {selectedScan.side_effects}
+                        Side Effects: <ReactMarkdown>{selectedScan.side_effects}</ReactMarkdown>
                       </div>
                     </div>
                   </div>
