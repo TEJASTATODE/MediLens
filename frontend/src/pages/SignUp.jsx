@@ -24,7 +24,7 @@ const SignUp = () => {
     try {
       
       const res = await api.post("/auth/google", {
-        token: credentialResponse.credential,
+        credential: credentialResponse.credential,
       });
       
   
