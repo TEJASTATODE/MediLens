@@ -27,7 +27,7 @@ GENAI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GENAI_API_KEY:
     raise ValueError("Set GEMINI_API_KEY environment variable")
 genai.configure(api_key=GENAI_API_KEY)
-model = genai.GenerativeModel("gemini-2.5-flash-lite")  
+model = genai.GenerativeModel("gemini-2.5-flash")  
 
 
 ocr = PaddleOCR(
