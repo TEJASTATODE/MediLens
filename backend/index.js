@@ -14,17 +14,20 @@ const historyRoutes = require("./routes/history");
 
 const app = express();
 
+/* ===================== SECURITY ===================== */
+app.set("trust proxy", 1);
 app.use(helmet());
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100, 
-  standardHeaders: true,
-  legacyHeaders: false,
-});
+app.use(
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+  })
+);
 
-app.use(limiter);
-
+/* ===================== CORS ===================== */
 app.use(
   cors({
     origin: ["https://medi-lens-pi.vercel.app"],
@@ -34,21 +37,26 @@ app.use(
   })
 );
 
-app.use(express.json({ limit: "50mb" }));
-app.use(express.urlencoded({ limit: "50mb", extended: true }));
+/* ===================== BODY LIMITS (FIX FOR OOM) ===================== */
+app.use(express.json({ limit: "5mb" }));
+app.use(express.urlencoded({ limit: "5mb", extended: true }));
 
-
+/* ===================== DATABASE ===================== */
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB connected"))
-  .catch((err) => console.error("❌ MongoDB connection error:", err));
+  .catch((err) => {
+    console.error("❌ MongoDB connection error:", err);
+    process.exit(1);
+  });
 
-
+/* ===================== ROUTES ===================== */
 app.use("/api/auth", authRoutes);
 app.use("/api/history", historyRoutes);
 
+/* ===================== FILE UPLOAD (STREAMING → S3) ===================== */
 const upload = multer({
-  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
 });
 
 app.post("/api/upload", upload.single("file"), async (req, res) => {
@@ -63,7 +71,7 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
       new PutObjectCommand({
         Bucket: BUCKET_NAME,
         Key: fileKey,
-        Body: req.file.buffer,
+        Body: req.file.stream, // ✅ STREAM (NO MEMORY BUFFER)
         ContentType: req.file.mimetype,
       })
     );
@@ -78,11 +86,20 @@ app.post("/api/upload", upload.single("file"), async (req, res) => {
   }
 });
 
+/* ===================== HEALTH CHECK ===================== */
 app.get("/", (req, res) => {
   res.send("MediLens Backend is running");
 });
 
+/* ===================== SERVER ===================== */
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("🚀 Server running on port", PORT);
+});
+
+/* ===================== GRACEFUL SHUTDOWN ===================== */
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down.");
+  process.exit(0);
 });
