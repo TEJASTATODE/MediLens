@@ -8,7 +8,7 @@ const getBaseURL = () => {
   // Fallback to Render if the environment variable isn't found
   return window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api' 
-    : 'https://medilens-1.onrender.com/api';
+    : 'http://medilens.ap-south-1.elasticbeanstalk.com/api';
 };
 
 const api = axios.create({
