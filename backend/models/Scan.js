@@ -6,8 +6,9 @@ const scanSchema = new mongoose.Schema({
     ref: "User", 
     required: true,
   },
-  image: {
-    type: String, 
+  imageKey: {
+    type: String,
+    required:false, 
   },
   medicineName: {
     type: String,

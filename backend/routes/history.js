@@ -1,44 +1,20 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const Scan = require("../models/Scan");
 const protect = require("../middleware/protect");
-const cloudinary = require('cloudinary').v2;
 
+const {
+  PutObjectCommand,
+  GetObjectCommand,
+  DeleteObjectCommand,
+} = require("@aws-sdk/client-s3");
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
+const { s3, BUCKET_NAME } = require("../utils/s3");
 
 router.post("/save", protect, async (req, res) => {
   try {
-    const { 
-      medicineName, 
-      composition, 
-      usage, 
-      dosage, 
-      manufacturer, 
-      side_effects, 
-      warning,
-      buy_link,
-      generic_name,
-      alternatives,
-      image 
-    } = req.body;
-
-    if (!image) {
-      return res.status(400).json({ message: "No image provided" });
-    }
-
-
-    const uploadResponse = await cloudinary.uploader.upload(image, {
-      folder: "medilens_scans",
-      resource_type: "image"
-    });
-
-    const newScan = new Scan({
-      user: req.user.id, 
+    const {
       medicineName,
       composition,
       usage,
@@ -49,23 +25,80 @@ router.post("/save", protect, async (req, res) => {
       buy_link,
       generic_name,
       alternatives,
-      image: uploadResponse.secure_url 
+      image, 
+    } = req.body;
+
+    if (!image) {
+      return res.status(400).json({ message: "No image provided" });
+    }
+
+   
+    const buffer = Buffer.from(image.split(",")[1], "base64");
+
+    const imageKey = `scans/${Date.now()}.png`;
+
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: imageKey,
+        Body: buffer,
+        ContentType: "image/png",
+      })
+    );
+
+    
+    const newScan = new Scan({
+      user: req.user.id,
+      medicineName,
+      composition,
+      usage,
+      dosage,
+      manufacturer,
+      side_effects,
+      warning,
+      buy_link,
+      generic_name,
+      alternatives,
+      imageKey,
     });
 
     await newScan.save();
-    res.status(201).json({ success: true, scan: newScan });
 
+    res.status(201).json({
+      success: true,
+      scan: newScan,
+    });
   } catch (error) {
     console.error("Save Error:", error);
     res.status(500).json({ message: "Error saving scan" });
   }
 });
 
-
 router.get("/", protect, async (req, res) => {
   try {
-    const history = await Scan.find({ user: req.user.id }).sort({ createdAt: -1 });
-    res.json(history);
+    const history = await Scan.find({ user: req.user.id }).sort({
+      createdAt: -1,
+    });
+
+    const response = await Promise.all(
+      history.map(async (scan) => {
+        const command = new GetObjectCommand({
+          Bucket: BUCKET_NAME,
+          Key: scan.imageKey,
+        });
+
+        const imageUrl = await getSignedUrl(s3, command, {
+          expiresIn: 300, 
+        });
+
+        return {
+          ...scan.toObject(),
+          imageUrl,
+        };
+      })
+    );
+
+    res.json(response);
   } catch (error) {
     console.error("Fetch Error:", error);
     res.status(500).json({ message: "Error fetching history" });
@@ -76,17 +109,24 @@ router.get("/", protect, async (req, res) => {
 router.delete("/:id", protect, async (req, res) => {
   try {
     const scan = await Scan.findById(req.params.id);
-    if (!scan) return res.status(404).json({ message: "Scan not found" });
+    if (!scan) {
+      return res.status(404).json({ message: "Scan not found" });
+    }
 
-   
-    const publicId = scan.image.split('/').slice(-2).join('/').split('.')[0]; 
-   
     
-    await cloudinary.uploader.destroy(publicId);
+    await s3.send(
+      new DeleteObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: scan.imageKey,
+      })
+    );
+
+
     await scan.deleteOne();
 
-    res.json({ message: "Success" });
+    res.json({ message: "Scan deleted successfully" });
   } catch (error) {
+    console.error("Delete Error:", error);
     res.status(500).json({ message: "Delete Error" });
   }
 });
