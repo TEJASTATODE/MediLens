@@ -5,10 +5,10 @@ const getBaseURL = () => {
   if (import.meta.env.VITE_API_URL) {
     return import.meta.env.VITE_API_URL;
   }
- 
+  // Fallback to Render if the environment variable isn't found
   return window.location.hostname === 'localhost' 
     ? 'http://localhost:5000/api' 
-    : 'https://d2mjyalgrqdo8v.cloudfront.net/api';
+    : 'https://medilens-1.onrender.com/api';
 };
 
 const api = axios.create({

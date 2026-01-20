@@ -18,7 +18,7 @@ def read_root():
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://medi-lens-pi.vercel.app","https://d2mjyalgrqdo8v.cloudfront.net"],
+    allow_origins=["http://localhost:5173", "https://medi-lens-pi.vercel.app"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

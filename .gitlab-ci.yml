@@ -1,39 +1,26 @@
 stages:
+  - build
   - deploy
 
-# ---------------- NODE BACKEND → AWS ELASTIC BEANSTALK ----------------
-deploy_backend_to_eb:
-  stage: deploy
-  image: amazon/aws-cli:2.15.28
+build_backend:
+  stage: build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
   script:
-    - aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
-    - aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
-    - aws configure set region "$AWS_DEFAULT_REGION"
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker build -t $CI_REGISTRY_IMAGE/backend:latest ./backend
+    - docker push $CI_REGISTRY_IMAGE/backend:latest
 
-    - zip -r backend.zip . \
-        -x "node_modules/*" ".git/*" ".gitlab-ci.yml"
-
-    - aws s3 cp backend.zip s3://$EB_S3_BUCKET/backend.zip
-
-    - aws elasticbeanstalk create-application-version \
-        --application-name "$EB_APP_NAME" \
-        --version-label "gitlab-$CI_PIPELINE_ID" \
-        --source-bundle S3Bucket="$EB_S3_BUCKET",S3Key="backend.zip"
-
-    - aws elasticbeanstalk update-environment \
-        --environment-name "$EB_ENV_NAME" \
-        --version-label "gitlab-$CI_PIPELINE_ID"
-  only:
-    - main
-
-# ---------------- FASTAPI → HUGGING FACE ----------------
-deploy_fastapi_to_hf:
+deploy_ai_to_hf:
   stage: deploy
   image: curlimages/curl:latest
   script:
-    - echo "Triggering Hugging Face Space restart"
+    - echo "Force-triggering Hugging Face Factory Rebuild..."
+    
     - |
       curl -X POST https://huggingface.co/api/spaces/hossie449/medilens/restart \
-      -H "Authorization: Bearer $HF_TOKEN"
+      -H "Authorization: Bearer $HF_TOKEN" \
+     
   only:
     - main
